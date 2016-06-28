@@ -2,32 +2,32 @@
 
 <html>
   <head>
-    <title>app-meta test</title>
+    <title>app-metadata test</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1, user-scalable=yes">
     <script src="../../webcomponentsjs/webcomponents-lite.js"></script>
     <script src="../../web-component-tester/browser.js"></script>
 
-    <link rel="import" href="../app-meta.html">
+    <link rel="import" href="../app-metadata.html">
   </head>
   <body>
 
     <test-fixture id="basic">
       <template>
-        <app-meta></app-meta>
+        <app-metadata></app-metadata>
       </template>
     </test-fixture>
 
     <script>
-      suite('app-meta', function() {
+      suite('app-metadata', function() {
         var meta;
 
         setup(function() {
           meta = fixture('basic');
         });
 
-        test('sets meta when there is an app-meta event', function() {
-          var event = new CustomEvent('app-meta', {
+        test('sets meta when there is an app-metadata event', function() {
+          var event = new CustomEvent('app-metadata', {
             bubbles: true,
             detail: {
               title: 'Title from event',

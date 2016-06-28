@@ -1,7 +1,7 @@
 <link rel="import" href="../polymer/polymer.html">
 
 <!--
-`app-meta` is a singleton element used to manage page meta-data for Search Engine Optimization (SEO).
+`app-metadata` is a singleton element used to manage page meta-data for Search Engine Optimization (SEO).
 It will add and remove `<meta>` elements to the page `<head>` section based on the JSON object passed
 to it.
 
@@ -17,22 +17,22 @@ Example:
       }
     });
 
-After the `app-meta` has been made available, elements can update the meta by firing bubbling `app-meta`
+After the `app-metadata` has been made available, elements can update the meta by firing bubbling `app-metadata`
 events.
 
 Example:
 
-    this.fire('app-meta', {
+    this.fire('app-metadata', {
       title: 'This is the page title',
       description: 'This is the page description',
       keywords: 'these,are,keywords'
     });
 
-Alternatively, create an instance of the `app-meta` element and set it's `data` property.
+Alternatively, create an instance of the `app-metadata` element and set it's `data` property.
 
 Example:
 
-    var meta = document.createElement('app-meta');
+    var meta = document.createElement('app-metadata');
     meta.data = {
       title: 'This is the page title',
       description: 'This is the page description',
@@ -47,7 +47,7 @@ Example:
   'use strict';
   (function() {
     Polymer.AppMeta = Polymer({
-      is: 'app-meta',
+      is: 'app-metadata',
 
       properties: {
         /**
@@ -76,7 +76,7 @@ Example:
           Polymer.AppMeta.instance = this;
         }
 
-        document.body.addEventListener('app-meta', this._onAppMeta.bind(this));
+        document.body.addEventListener('app-metadata', this._onAppMeta.bind(this));
       },
 
       /**
@@ -124,7 +124,7 @@ Example:
 
     Polymer.AppMeta.requestAvailability = function() {
       if (!Polymer.AppMeta.instance) {
-        Polymer.AppMeta.instance = document.createElement('app-meta');
+        Polymer.AppMeta.instance = document.createElement('app-metadata');
         document.body.appendChild(Polymer.AppMeta.instance);
       }
     };

@@ -1,7 +1,7 @@
 {
-  "name": "app-meta",
+  "name": "app-metadata",
   "description": "Manage page meta tags for SEO",
-  "main": "app-meta.html",
+  "main": "app-metadata.html",
   "dependencies": {
     "polymer": "Polymer/polymer#^1.4.0"
   },
