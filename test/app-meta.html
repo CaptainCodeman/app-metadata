@@ -1,0 +1,62 @@
+<!doctype html>
+
+<html>
+  <head>
+    <title>app-meta test</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1, user-scalable=yes">
+    <script src="../../webcomponentsjs/webcomponents-lite.js"></script>
+    <script src="../../web-component-tester/browser.js"></script>
+
+    <link rel="import" href="../app-meta.html">
+  </head>
+  <body>
+
+    <test-fixture id="basic">
+      <template>
+        <app-meta></app-meta>
+      </template>
+    </test-fixture>
+
+    <script>
+      suite('app-meta', function() {
+        var meta;
+
+        setup(function() {
+          meta = fixture('basic');
+        });
+
+        test('sets meta when there is an app-meta event', function() {
+          var event = new CustomEvent('app-meta', {
+            bubbles: true,
+            detail: {
+              title: 'Title from event',
+              description: 'Description from event'
+            }
+          });
+
+          sinon.spy(meta, '_dataChanged');
+
+          document.body.dispatchEvent(event);
+
+          expect(meta._dataChanged.callCount).to.be.equal(1);
+
+          assert.equal(document.title, 'Title from event');
+          var d = document.querySelector('meta[name="description"]');
+          assert.equal(d.content, 'Description from event');
+        });
+
+        test('setting meta data', function() {
+          meta.data = {
+            title: 'Title from data',
+            description: 'Description from data'
+          };
+          assert.equal(document.title, 'Title from data');
+          var d = document.querySelector('meta[name="description"]');
+          assert.equal(d.content, 'Description from data');
+        });
+
+      });
+    </script>
+  </body>
+</html>
