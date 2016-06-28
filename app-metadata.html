@@ -5,7 +5,7 @@
 It will add and remove `<meta>` elements to the page `<head>` section based on the JSON object passed
 to it.
 
-In order to make use of the meta manager, it is best to request it's availability in the app element.
+In order to make use of the meta data manager, it is best to request it's availability in the app element.
 
 Example:
 
@@ -13,7 +13,7 @@ Example:
       is: 'my-app',
       attached: function() {
         // this will create the singleton element if it has not been created yet
-        Polymer.AppMeta.requestAvailability();
+        Polymer.AppMetadata.requestAvailability();
       }
     });
 
@@ -46,7 +46,7 @@ Example:
 <script>
   'use strict';
   (function() {
-    Polymer.AppMeta = Polymer({
+    Polymer.AppMetadata = Polymer({
       is: 'app-metadata',
 
       properties: {
@@ -72,11 +72,11 @@ Example:
       },
 
       created: function() {
-        if (!Polymer.AppMeta.instance) {
-          Polymer.AppMeta.instance = this;
+        if (!Polymer.AppMetadata.instance) {
+          Polymer.AppMetadata.instance = this;
         }
 
-        document.body.addEventListener('app-metadata', this._onAppMeta.bind(this));
+        document.body.addEventListener('app-metadata', this._onAppMetadata.bind(this));
       },
 
       /**
@@ -113,19 +113,19 @@ Example:
         }
       },
 
-      _onAppMeta: function(event) {
+      _onAppMetadata: function(event) {
         if (event.detail && typeof event.detail === 'object') {
           this.set('data', event.detail);
         }
       }
     });
 
-    Polymer.AppMeta.instance = null;
+    Polymer.AppMetadata.instance = null;
 
-    Polymer.AppMeta.requestAvailability = function() {
-      if (!Polymer.AppMeta.instance) {
-        Polymer.AppMeta.instance = document.createElement('app-metadata');
-        document.body.appendChild(Polymer.AppMeta.instance);
+    Polymer.AppMetadata.requestAvailability = function() {
+      if (!Polymer.AppMetadata.instance) {
+        Polymer.AppMetadata.instance = document.createElement('app-metadata');
+        document.body.appendChild(Polymer.AppMetadata.instance);
       }
     };
   })();
