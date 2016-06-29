@@ -1,5 +1,6 @@
 {
   "name": "app-metadata",
+  "version": "0.0.5",
   "description": "Manage page meta tags for SEO",
   "authors": [
     "Simon Green <simon@captaincodeman.com>"
