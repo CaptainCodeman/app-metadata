@@ -32,8 +32,8 @@
             detail: {
               title: 'Title from event',
               description: 'Description from event',
-              'og:title': 'Title from data (OpenGraph)',
-              'og:description': 'Description from data (OpenGraph)'
+              'og:title': 'Title from event (OpenGraph)',
+              'og:description': 'Description from event (OpenGraph)'
             }
           });
 
@@ -47,9 +47,9 @@
           var d = document.querySelector('meta[name="description"]');
           assert.equal(d.content, 'Description from event');;
           var ot = document.querySelector('meta[property="og:title"]');
-          assert.equal(ot.content, 'Title from data (OpenGraph)');
+          assert.equal(ot.content, 'Title from event (OpenGraph)');
           var od = document.querySelector('meta[property="og:description"]');
-          assert.equal(od.content, 'Description from data (OpenGraph)');
+          assert.equal(od.content, 'Description from event (OpenGraph)');
         });
 
         test('setting meta data', function() {
