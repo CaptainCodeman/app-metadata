@@ -31,7 +31,9 @@
             bubbles: true,
             detail: {
               title: 'Title from event',
-              description: 'Description from event'
+              description: 'Description from event',
+              'og:title': 'Title from data (OpenGraph)',
+              'og:description': 'Description from data (OpenGraph)'
             }
           });
 
@@ -43,17 +45,27 @@
 
           assert.equal(document.title, 'Title from event');
           var d = document.querySelector('meta[name="description"]');
-          assert.equal(d.content, 'Description from event');
+          assert.equal(d.content, 'Description from event');;
+          var ot = document.querySelector('meta[property="og:title"]');
+          assert.equal(ot.content, 'Title from data (OpenGraph)');
+          var od = document.querySelector('meta[property="og:description"]');
+          assert.equal(od.content, 'Description from data (OpenGraph)');
         });
 
         test('setting meta data', function() {
           meta.data = {
             title: 'Title from data',
-            description: 'Description from data'
+            description: 'Description from data',
+            'og:title': 'Title from data (OpenGraph)',
+            'og:description': 'Description from data (OpenGraph)'
           };
           assert.equal(document.title, 'Title from data');
           var d = document.querySelector('meta[name="description"]');
           assert.equal(d.content, 'Description from data');
+          var ot = document.querySelector('meta[property="og:title"]');
+          assert.equal(ot.content, 'Title from data (OpenGraph)');
+          var od = document.querySelector('meta[property="og:description"]');
+          assert.equal(od.content, 'Description from data (OpenGraph)');
         });
 
       });
