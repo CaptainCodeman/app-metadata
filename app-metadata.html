@@ -89,23 +89,18 @@ Example:
             // title is a special case
             if (name === 'title') {
               document.title = this.data[name];
-            } else if (name.substring(0, 3) === 'og:') {
-              // re-use any already-created meta-tags if possible
-              if (this._meta.hasOwnProperty(name)) {
-                this._meta[name].content = this.data[name];
-              } else {
-                var m = document.createElement('meta');
-                m.setAttribute('property', name); m.content = this.data[name];
-                document.head.appendChild(m);
-                this._meta[name] = m;
-              }
             } else {
               // re-use any already-created meta-tags if possible
               if (this._meta.hasOwnProperty(name)) {
                 this._meta[name].content = this.data[name];
               } else {
                 var m = document.createElement('meta');
-                m.name = name; m.content = this.data[name];
+                if (name.substring(0, 3) === 'og:') {
+                  m.setAttribute('property', name);
+                } else {
+                  m.name = name;
+                }
+                m.content = this.data[name];
                 document.head.appendChild(m);
                 this._meta[name] = m;
               }
