@@ -1,0 +1,41 @@
+<!doctype html>
+<html>
+  <head>
+    <title>app-metadata demo</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1, user-scalable=yes">
+    <script src="../../webcomponentsjs/webcomponents-lite.js"></script>
+
+    <link rel="import" href="../../iron-demo-helpers/demo-pages-shared-styles.html">
+    <link rel="import" href="../../iron-demo-helpers/demo-snippet.html">
+
+    <link rel="import" href="../app-metadata.html">
+
+    <style is="custom-style" include="demo-pages-shared-styles">
+    </style>
+  </head>
+  <body>
+
+    <div class="vertical-section-container centered">
+      <h3>Basic app-metadata Demo</h3>
+      <demo-snippet>
+        <p><button onClick="setMetadata()">Set page meta-data</button></p>
+      </demo-snippet>
+    </div>
+
+    <script>
+      function setMetadata() {
+        var meta = document.createElement("app-metadata");
+        meta.data = {
+          title: '<app-metadata> polymer element',
+          description: 'A Polymer element to manage page meta tags for SEO',
+          keywords: 'polymer,element,meta,tags,page,SEO,search engine optimization',
+          robots: 'follow,index',
+          'og:title': '<app-metadata> polymer element',
+          'og:description': 'A Polymer element to manage page meta tags for Facebook Opengraph'
+        };
+      }
+    </script>
+
+  </body>
+</html>

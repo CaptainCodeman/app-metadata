@@ -1,0 +1,137 @@
+<link rel="import" href="../polymer/polymer.html">
+
+<!--
+`app-metadata` is a singleton element used to manage page meta-data for Search Engine Optimization (SEO).
+It will add and remove `<meta>` elements to the page `<head>` section based on the JSON object passed
+to it.
+
+In order to make use of the meta data manager, it is best to request it's availability in the app element.
+
+Example:
+
+    Polymer({
+      is: 'my-app',
+      attached: function() {
+        // this will create the singleton element if it has not been created yet
+        Polymer.AppMetadata.requestAvailability();
+      }
+    });
+
+After the `app-metadata` has been made available, elements can update the meta by firing bubbling `app-metadata`
+events.
+
+Example:
+
+    this.fire('app-metadata', {
+      title: 'This is the page title',
+      description: 'This is the page description',
+      keywords: 'these,are,keywords'
+    });
+
+Alternatively, create an instance of the `app-metadata` element and set it's `data` property.
+
+Example:
+
+    var meta = document.createElement('app-metadata');
+    meta.data = {
+      title: 'This is the page title',
+      description: 'This is the page description',
+      keywords: 'these,are,keywords'
+    };
+
+@group App Elements
+@demo demo/index.html
+-->
+
+<script>
+  'use strict';
+  (function() {
+    Polymer.AppMetadata = Polymer({
+      is: 'app-metadata',
+
+      properties: {
+        /**
+         * An object that contains the meta data currently set on the page.
+         * The object keys will be used for the `name` of the <meta> tag
+         * and the values the `content`.
+         */
+        data: {
+          type: Object,
+          value: {},
+          observer: '_dataChanged'
+        },
+
+        /**
+         * Object to keep track of added meta elements so they can be reused
+         * or removed as necessary
+         */
+        _meta: {
+          type: Object,
+          value: {}
+        }
+      },
+
+      created: function() {
+        if (!Polymer.AppMetadata.instance) {
+          Polymer.AppMetadata.instance = this;
+        }
+
+        document.body.addEventListener('app-metadata', this._onAppMetadata.bind(this));
+      },
+
+      /**
+       * Update the DOM when the data changes
+       */
+      _dataChanged: function(newValue, oldValue) {
+        var names = [];
+        for(var name in this.data) {
+          if (this.data.hasOwnProperty(name)) {
+            // title is a special case
+            if (name === 'title') {
+              document.title = this.data[name];
+            } else {
+              // re-use any already-created meta-tags if possible
+              if (this._meta.hasOwnProperty(name)) {
+                this._meta[name].content = this.data[name];
+              } else {
+                var m = document.createElement('meta');
+                if (name.substring(0, 3) === 'og:') {
+                  m.setAttribute('property', name);
+                } else {
+                  m.name = name;
+                }
+                m.content = this.data[name];
+                document.head.appendChild(m);
+                this._meta[name] = m;
+              }
+            }
+            // keep track of names of meta we've added
+            names.push(name);
+          }
+        }
+        // remove any leftover meta tags that weren't re-used
+        for(var name in this._meta) {
+          if (this._meta.hasOwnProperty(name) && names.indexOf(name) === -1) {
+            document.head.removeChild(this._meta[name]);
+            delete this._meta[name];
+          }
+        }
+      },
+
+      _onAppMetadata: function(event) {
+        if (event.detail && typeof event.detail === 'object') {
+          this.set('data', event.detail);
+        }
+      }
+    });
+
+    Polymer.AppMetadata.instance = null;
+
+    Polymer.AppMetadata.requestAvailability = function() {
+      if (!Polymer.AppMetadata.instance) {
+        Polymer.AppMetadata.instance = document.createElement('app-metadata');
+        document.body.appendChild(Polymer.AppMetadata.instance);
+      }
+    };
+  })();
+</script>

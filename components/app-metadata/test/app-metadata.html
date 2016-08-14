@@ -1,0 +1,74 @@
+<!doctype html>
+
+<html>
+  <head>
+    <title>app-metadata test</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1, user-scalable=yes">
+    <script src="../../webcomponentsjs/webcomponents-lite.js"></script>
+    <script src="../../web-component-tester/browser.js"></script>
+
+    <link rel="import" href="../app-metadata.html">
+  </head>
+  <body>
+
+    <test-fixture id="basic">
+      <template>
+        <app-metadata></app-metadata>
+      </template>
+    </test-fixture>
+
+    <script>
+      suite('app-metadata', function() {
+        var meta;
+
+        setup(function() {
+          meta = fixture('basic');
+        });
+
+        test('sets meta when there is an app-metadata event', function() {
+          var event = new CustomEvent('app-metadata', {
+            bubbles: true,
+            detail: {
+              title: 'Title from event',
+              description: 'Description from event',
+              'og:title': 'Title from event (OpenGraph)',
+              'og:description': 'Description from event (OpenGraph)'
+            }
+          });
+
+          sinon.spy(meta, '_dataChanged');
+
+          document.body.dispatchEvent(event);
+
+          expect(meta._dataChanged.callCount).to.be.equal(1);
+
+          assert.equal(document.title, 'Title from event');
+          var d = document.querySelector('meta[name="description"]');
+          assert.equal(d.content, 'Description from event');;
+          var ot = document.querySelector('meta[property="og:title"]');
+          assert.equal(ot.content, 'Title from event (OpenGraph)');
+          var od = document.querySelector('meta[property="og:description"]');
+          assert.equal(od.content, 'Description from event (OpenGraph)');
+        });
+
+        test('setting meta data', function() {
+          meta.data = {
+            title: 'Title from data',
+            description: 'Description from data',
+            'og:title': 'Title from data (OpenGraph)',
+            'og:description': 'Description from data (OpenGraph)'
+          };
+          assert.equal(document.title, 'Title from data');
+          var d = document.querySelector('meta[name="description"]');
+          assert.equal(d.content, 'Description from data');
+          var ot = document.querySelector('meta[property="og:title"]');
+          assert.equal(ot.content, 'Title from data (OpenGraph)');
+          var od = document.querySelector('meta[property="og:description"]');
+          assert.equal(od.content, 'Description from data (OpenGraph)');
+        });
+
+      });
+    </script>
+  </body>
+</html>
