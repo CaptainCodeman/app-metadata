@@ -58,7 +58,7 @@
  * @demo demo/index.html
  *
  */
-class AppMetadataElement extends HTMLElement {
+class AppMetadata extends HTMLElement {
   constructor() {
     super();
 
@@ -122,8 +122,10 @@ class AppMetadataElement extends HTMLElement {
   }
 }
 
-AppMetadata.instance = null;
+window.customElements.define('app-metadata', AppMetadata);
 
+
+AppMetadata.instance = null;
 AppMetadata.requestAvailability = function() {
   if (!AppMetadata.instance) {
     AppMetadata.instance = document.createElement('app-metadata');
