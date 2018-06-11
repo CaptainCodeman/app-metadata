@@ -1,0 +1,21 @@
+{
+  "compilerOptions": {
+    "outDir": ".",
+    "sourceMap": true,
+    "module": "es2015",
+    "target": "es2017",
+    "moduleResolution": "node",
+    "noImplicitAny": true,
+    "declaration": false,
+    "strict": true,
+    "skipLibCheck": true,
+    "stripInternal": true,
+    "lib": [
+      "es2017",
+      "dom",
+    ]
+  },
+  "files": [
+    "src/index.ts"
+  ]
+}

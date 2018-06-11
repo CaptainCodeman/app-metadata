@@ -1,49 +1,66 @@
-_[Demo and API docs](http://captaincodeman.github.io/app-metadata/)_
+# app-metadata
 
-##&lt;app-metadata&gt;
+`app-metadata` is a module to help manage page metadata for Search Engine
+Optimization (SEO) and social sharing (e.g. Twitter cards, OpenGraph).
 
-`app-metadata` is a singleton element used to manage page meta-data for Search Engine Optimization (SEO).
-It will add and remove `<meta>` elements to the page `<head>` section based on the JSON object passed
-to it.
+It will add and remove `<meta>` elements in the page `<head>` section based
+on the JSON object passed to it. This can update page titles while a use
+navigates a Single Page Application (SPA) or Progressive Web App (PWA) or
+set the values to be Server-Side Rendered (e.g. using puppeteer).
 
-In order to make use of the meta data manager, it is best to request it's availability in the app element.
+Any `title` key will be used to set the page title. `description`,
+`image` and `url` keys will set the `og:...` and `twitter:...` meta
+values and any other key will be used directly.
 
-Example:
+The `name` attribute is used for the `<meta>` tag unless the key is for an
+OpenGraph value in which case the `property` attribute will be set. i.e.
 
-    Polymer({
-      is: 'my-app',
-      attached: function() {
-        // this will create the singleton element if it has not been created yet
-        Polymer.AppMetadata.requestAvailability();
-      }
-    });
+`twitter:image` metadata will set <meta name="twitter:image" content="...">
+`og:image` metadata will set <meta property="og:image" content="...">
 
-After the `app-metadata` has been made available, elements can update the meta by firing bubbling `app-metadata`
-events.
+## Usage
 
-Example:
+Import `updateMetadata` and call as required:
 
-    this.fire('app-metadata', {
-      title: 'This is the page title',
-      description: 'This is the page description',
-      keywords: 'these,are,keywords'
-    });
+```
+import { updateMetadata } from 'app-metadata';
 
-Alternatively, create an instance of the `app-metadata` element and set it's `data` property.
+updateMetadata({
+    title: 'This is the page title',
+    description: 'This is the page description',
+    keywords: 'these,are,keywords',
+    image: 'https://www.example.com/myimage.jpg',
+})
+```
 
-Example:
+Alternatively, use `addMetadataListener` to register a listener and raise
+`app-metadata` CustomEvent with the metadata in the event detail:
 
-    var meta = document.createElement('app-metadata');
-    meta.data = {
-      title: 'This is the page title',
-      description: 'This is the page description',
-      keywords: 'these,are,keywords'
-    };
+```
+import { addMetadataListener } from 'app-metadata';
 
-##Demonstration
+addMetadataListener()
 
-To demonstrate this approach does work I've created a very [simple test site](http://app-metadata.appspot.com/)
-using the polymer-cli and added some content with the meta html headers set for each view using this `<app-metadata>` element.
+// elsewhere ...
+
+this.dispatchEvent(new CustomEvent({
+    bubbles: true,
+    composed: true,
+    detail: {
+        title: 'This is the page title',
+        description: 'This is the page description',
+        keywords: 'these,are,keywords',
+        image: 'https://www.example.com/myimage.jpg',
+    },
+}))
+```
+
+## Demonstration
+
+To demonstrate this approach does work for SEO I've created a very
+[simple test site](http://app-metadata.appspot.com/) using the polymer-cli
+and added some content with the meta html headers set for each view using
+this `<app-metadata>` element.
 
 Here's the meta data set for the main view:
 
