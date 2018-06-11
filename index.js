@@ -4,11 +4,11 @@ export function addMetadataListener() {
 function OnAppMetadata(e) {
     updateMetadata(e.detail);
 }
-export function updateMetadata(data) {
-    setMedatadata(Object.assign({}, data, { url: data.url || document.location.href }));
+export function updateMetadata(data, entries) {
+    syncMedatadata(Object.assign({}, data, { url: data.url || document.location.href }), entries);
 }
-function setMedatadata(data) {
-    const keysUsed = [];
+const head = document.head;
+function syncMedatadata(data, entries) {
     const keys = Object.keys(data);
     for (let i = 0; i < keys.length; i++) {
         const key = keys[i];
@@ -18,7 +18,7 @@ function setMedatadata(data) {
                 document.title = value;
                 break;
             default:
-                keysUsed.push(setMetaValue(key, value));
+                setMetaValue(0, key, value);
                 break;
         }
         switch (key) {
@@ -26,43 +26,70 @@ function setMedatadata(data) {
             case 'description':
             case 'image':
             case 'url':
-                keysUsed.push(setMetaValue('og:' + key, value));
-                keysUsed.push(setMetaValue('twitter:' + key, value));
+                setMetaValue(0, 'og:' + key, value);
+                setMetaValue(0, 'twitter:' + key, value);
                 break;
         }
     }
-    const keysExisting = Object.keys(metaElements);
-    for (let i = 0; i < keysExisting.length; i++) {
-        const key = keysExisting[i];
-        if (keysUsed.indexOf(key) === -1) {
-            document.head.removeChild(metaElements[key]);
-            delete metaElements[key];
+    if (entries) {
+        for (let i = 0; i < entries.length; i++) {
+            const set = entries[i];
+            for (let j = 0; j < set.length; j++) {
+                const entry = set[j];
+                setMetaValue(i, entry.key, entry.value);
+            }
         }
     }
+    cleanupUnused();
 }
-/**
- * Object to keep track of added meta elements so that
- * they can be reused or removed as necessary
- */
 const metaElements = {};
-function setMetaValue(key, value) {
+function setMetaValue(index, key, value) {
     const attrName = key.startsWith('og:') ? 'property' : 'name';
-    // re-use any already-created meta-tags if possible
-    let element = metaElements[key];
-    if (!element) {
-        // check for existing element (maybe in original server-rendered page)
+    let element;
+    let elements = metaElements[key];
+    if (elements) {
+        element = elements[index];
+    }
+    else {
+        elements = [];
+        metaElements[key] = elements;
+    }
+    if (element) {
+        element.content = value;
+    }
+    else {
         const selector = `meta[${attrName}="${key}"]`;
-        element = document.head.querySelector(selector);
+        let element = index
+            ? head.querySelectorAll(selector)[index]
+            : head.querySelector(selector);
         if (!element) {
             // otherwise create a new element
             element = document.createElement('meta');
             element.setAttribute(attrName, key);
-            document.head.appendChild(element);
+            head.appendChild(element);
         }
-        metaElements[key] = element;
+        element.content = value;
+        elements[index] = element;
     }
-    // set the new value
-    element.content = value;
-    return key;
+    updated[key] = index + 1;
+}
+// count of updated metadata used in each iteration
+let updated = {};
+// cleanup previously existing metatags that are now unused
+function cleanupUnused() {
+    const keys = Object.keys(metaElements);
+    for (let i = 0; i < keys.length; i++) {
+        const key = keys[i];
+        const elements = metaElements[key];
+        const used = updated[key] || 0;
+        if (elements.length > used) {
+            for (let n = used; n < elements.length; n++) {
+                head.removeChild(elements[n]);
+            }
+            elements.splice(used);
+        }
+    }
+    // reset for next time
+    updated = {};
 }
 //# sourceMappingURL=index.js.map

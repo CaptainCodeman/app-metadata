@@ -14,13 +14,17 @@ function OnAppMetadata(e: CustomEvent<Metadata>) {
 
 export type Metadata = { [key: string]: string }
 
-export function updateMetadata(data: Metadata) {
-  setMedatadata({ ...data, url: data.url || document.location.href })
+export type MetadataEntry = { key: string, value: string }
+
+export function updateMetadata(data: Metadata, entries?: MetadataEntry[][] ) {
+  syncMedatadata({ ...data, url: data.url || document.location.href }, entries)
 }
 
-function setMedatadata(data: Metadata) {
-  const keysUsed: string[] = []
+const head = document.head
+
+function syncMedatadata(data: Metadata, entries?: MetadataEntry[][]) {
   const keys = Object.keys(data)
+
   for (let i = 0; i < keys.length; i++) {
     const key = keys[i]
     const value = data[key]
@@ -30,7 +34,7 @@ function setMedatadata(data: Metadata) {
         document.title = value
         break;
       default:
-        keysUsed.push(setMetaValue(key, value))
+        setMetaValue(0, key, value)
         break
     }
 
@@ -39,47 +43,83 @@ function setMedatadata(data: Metadata) {
       case 'description':
       case 'image':
       case 'url':
-        keysUsed.push(setMetaValue('og:' + key, value))
-        keysUsed.push(setMetaValue('twitter:' + key, value))
+        setMetaValue(0, 'og:' + key, value)
+        setMetaValue(0, 'twitter:' + key, value)
         break
     }
   }
 
-  const keysExisting = Object.keys(metaElements)
-  for (let i = 0; i < keysExisting.length; i++) {
-    const key = keysExisting[i]
-    if (keysUsed.indexOf(key) === -1) {
-      document.head.removeChild(metaElements[key])
-      delete metaElements[key]
+  if (entries) {
+    for (let i = 0; i < entries.length; i++) {
+      const set = entries[i]
+      for (let j = 0; j < set.length; j++) {
+        const entry = set[j]
+        setMetaValue(i, entry.key, entry.value)
+      }
     }
   }
+
+  cleanupUnused()
 }
 
-/**
- * Object to keep track of added meta elements so that
- * they can be reused or removed as necessary
- */
-const metaElements: { [key: string]: HTMLMetaElement } = {}
+// keep track of added meta elements so that
+// they can be reused or removed as required
+type metaMap = { [key: string]: HTMLMetaElement[] }
+const metaElements: metaMap = {}
 
-function setMetaValue(key: string, value: string) {
+function setMetaValue(index: number, key: string, value: string) {
   const attrName = key.startsWith('og:') ? 'property' : 'name'
 
-  // re-use any already-created meta-tags if possible
-  let element = metaElements[key]
-  if (!element) {
-    // check for existing element (maybe in original server-rendered page)
+  let element: HTMLMetaElement | undefined
+  let elements = metaElements[key]
+  if (elements) {
+    element = elements[index]
+  } else {
+    elements = []
+    metaElements[key] = elements
+  }
+
+  if (element) {
+    element.content = value
+  } else {
     const selector = `meta[${attrName}="${key}"]`
-    element = <HTMLMetaElement>document.head.querySelector(selector)
+
+    let element = index
+      ? <HTMLMetaElement>head.querySelectorAll(selector)[index]
+      : <HTMLMetaElement>head.querySelector(selector)
+
     if (!element) {
       // otherwise create a new element
       element = document.createElement('meta')
       element.setAttribute(attrName, key)
-      document.head.appendChild(element)
+      head.appendChild(element)
     }
-    metaElements[key] = element
+
+    element.content = value
+    elements[index] = element
   }
 
-  // set the new value
-  element.content = value
-  return key
+  updated[key] = index + 1
+}
+
+// count of updated metadata used in each iteration
+let updated : { [key: string]: number } = {}
+
+// cleanup previously existing metatags that are now unused
+function cleanupUnused() {
+  const keys = Object.keys(metaElements)
+  for (let i = 0; i < keys.length; i++) {
+    const key = keys[i]
+    const elements = metaElements[key]
+    const used = updated[key] || 0
+    if (elements.length > used) {
+      for (let n = used; n < elements.length; n++) {
+        head.removeChild(elements[n])
+      }
+      elements.splice(used)
+    }
+  }
+
+  // reset for next time
+  updated = {}
 }
