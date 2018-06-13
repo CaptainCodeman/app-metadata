@@ -43,8 +43,15 @@ function syncMedatadata(data, entries) {
     cleanupUnused();
 }
 const metaElements = {};
+const propertyPrefixes = ['fb', 'og', 'product'];
+function getAttrName(key) {
+    const parts = key.split(':');
+    return parts.length === 1 || propertyPrefixes.indexOf(parts[0]) === -1
+        ? 'name'
+        : 'property';
+}
 function setMetaValue(index, key, value) {
-    const attrName = key.startsWith('og:') ? 'property' : 'name';
+    const attrName = getAttrName(key);
     let element;
     let elements = metaElements[key];
     if (elements) {

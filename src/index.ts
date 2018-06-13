@@ -67,8 +67,17 @@ function syncMedatadata(data: Metadata, entries?: MetadataEntry[][]) {
 type metaMap = { [key: string]: HTMLMetaElement[] }
 const metaElements: metaMap = {}
 
+const propertyPrefixes = ['fb', 'og', 'product']
+
+function getAttrName(key: string) {
+  const parts = key.split(':')
+  return parts.length === 1 || propertyPrefixes.indexOf(parts[0]) === -1
+    ? 'name'
+    : 'property'
+}
+
 function setMetaValue(index: number, key: string, value: string) {
-  const attrName = key.startsWith('og:') ? 'property' : 'name'
+  const attrName = getAttrName(key)
 
   let element: HTMLMetaElement | undefined
   let elements = metaElements[key]
