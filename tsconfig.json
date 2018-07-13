@@ -1,8 +1,8 @@
 {
   "compilerOptions": {
-    "outDir": ".",
+    "outDir": "dist",
     "sourceMap": true,
-    "module": "es2015",
+    "module": "commonjs",
     "target": "es2017",
     "moduleResolution": "node",
     "noImplicitAny": true,
